@@ -1,0 +1,15 @@
+-- =============================================
+-- Description: Identifies duplicate filenames across non-deleted documents.
+--              Results are ordered by highest duplicate count first.
+-- =============================================
+
+Select 
+	d.FileName as file_name,
+	COUNT(d.Filename) as number_of_files_with_this_name
+From Documents d
+WHERE Deleted = 0
+Group By d.Filename
+Having COUNT(*) > 1
+Order by COUNT(d.Filename) DESC
+
+
