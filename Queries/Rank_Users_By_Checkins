@@ -1,0 +1,15 @@
+-- =============================================
+-- Description: Ranks users by check-in activity per month.
+--              Excludes disabled user accounts.
+-- =============================================
+
+Select 
+    b.Username as username,
+    YEAR(a.Date) * 100 + MONTH(a.Date) AS YearMonthInteger,
+    RANK() over (Partition By YEAR(a.Date) * 100 + MONTH(a.Date) ORDER BY COUNT(*) DESC) as CheckInRank,
+    COUNT(*) as CheckInCount
+From Revisions as a
+inner join Users as b
+    on a.UserID = b.UserID
+where b.Enabled <> 0
+group by b.Username, (YEAR(a.Date) * 100 + MONTH(a.Date)), b.Enabled;
