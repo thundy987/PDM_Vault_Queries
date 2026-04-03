@@ -16,6 +16,26 @@
 		ON d.DocumentID = dp.DocumentID
 	INNER JOIN Projects p
 		ON dp.ProjectID = p.ProjectID
+	INNER JOIN ObjectType ot
+    ON d.ObjectTypeID = ot.ObjectTypeID
+WHERE
+    -- Only real files
+    ot.Description = 'Normal Document'
+
+    -- File itself not deleted
+    AND d.Deleted = 0
+
+    -- File exists in at least one non-deleted folder
+    AND EXISTS (
+        SELECT 1
+        FROM DocumentsInProjects dip
+        INNER JOIN Projects p
+            ON dip.ProjectID = p.ProjectID
+        WHERE
+            dip.DocumentID = d.DocumentID
+            AND dip.Deleted = 0
+            AND p.Deleted = 0
+        )
 )
 
 Select
