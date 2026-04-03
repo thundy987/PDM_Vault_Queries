@@ -15,8 +15,8 @@ Join Users u
 	on d.UserID = u.UserID
 where 
 	LockDate IS NOT NULL and 
-	u.Username NOT LIKE '%Deleted%'	
-Group By u.Username
+	u.Enabled <> 0 
+Group By u.Username, u.Enabled
 Having
 	MAX(DateDiff (DAY, d.LockDate, GETDATE())) >= @days_checked_out
 order By MAX(DateDiff (DAY, d.LockDate, GETDATE())) DESC, Count (d.LockDate) DESC;
