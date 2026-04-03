@@ -1,0 +1,17 @@
+-- =============================================
+-- Description: Ranks workflow states and transitions by usage frequency,
+--              lowest first. Useful for identifying candidates for cleanup
+--              or removal from the vault workflow.
+-- =============================================
+
+Select
+	s.Name as least_used_state_name,
+	t.Name as transition_name,
+	COUNT(th.Date) as number_of_times_this_transition_used
+From TransitionHistory th
+INNER JOIN Transitions t
+	ON th.TransitionID = t.TransitionID
+INNER JOIN Status s
+	ON s.StatusID = t.Destination
+GROUP BY t.Name, s.Name
+ORDER BY COUNT(th.Date)
