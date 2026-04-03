@@ -1,0 +1,22 @@
+-- =============================================
+-- Description: Identifies users with files checked out longer than
+--              @days_checked_out. Returns file count and longest
+--              checkout duration per user, ordered by longest first.
+-- =============================================
+
+Declare @days_checked_out int = 7;
+
+Select
+	Count (d.LockDate) as number_of_files_checked_out,
+	MAX(DateDiff (DAY, d.LockDate, GETDATE())) as max_days_checked_out,
+	u.Username as username
+From Documents d
+Join Users u
+	on d.UserID = u.UserID
+where 
+	LockDate IS NOT NULL and 
+	u.Username NOT LIKE '%Deleted%'	
+Group By u.Username
+Having
+	MAX(DateDiff (DAY, d.LockDate, GETDATE())) >= @days_checked_out
+order By MAX(DateDiff (DAY, d.LockDate, GETDATE())) DESC, Count (d.LockDate) DESC;
