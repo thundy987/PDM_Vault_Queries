@@ -7,9 +7,26 @@ Select
 	d.FileName as file_name,
 	COUNT(d.Filename) as number_of_files_with_this_name
 From Documents d
-WHERE Deleted = 0
+INNER JOIN ObjectType ot
+    ON d.ObjectTypeID = ot.ObjectTypeID
+WHERE
+    -- Only real files
+    ot.Description = 'Normal Document'
+
+    -- File itself not deleted
+    AND d.Deleted = 0
+
+    -- File exists in at least one non-deleted folder
+    AND EXISTS (
+        SELECT 1
+        FROM DocumentsInProjects dip
+        INNER JOIN Projects p
+            ON dip.ProjectID = p.ProjectID
+        WHERE
+            dip.DocumentID = d.DocumentID
+            AND dip.Deleted = 0
+            AND p.Deleted = 0
+        )
 Group By d.Filename
 Having COUNT(*) > 1
 Order by COUNT(d.Filename) DESC
-
-
