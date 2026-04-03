@@ -1,0 +1,26 @@
+-- =============================================
+-- Description: Identifies files stuck in a workflow state longer than
+--              @days_in_state. Results are ordered by longest wait first.
+-- =============================================
+
+Declare @days_in_state int = 4;
+
+Select
+	d.Filename as file_name,
+	--d.DocumentID as document_ID,
+	MAX(th.Date) as last_transition_date,
+	s.Name as current_state,
+	DATEDIFF(DAY, MAX(th.Date), GETDATE()) as days_in_state
+From TransitionHistory th
+INNER JOIN Transitions t
+	ON th.TransitionID = t.TransitionID
+INNER JOIN Status s
+	ON s.StatusID = t.Destination
+INNER JOIN Documents d
+	ON th.DocumentID = d.DocumentID
+INNER JOIN Users u
+	On th.UserID = u.UserID
+Where d.Deleted = 0
+Group By d.Filename, s.Name
+HAVING DATEDIFF(DAY, MAX(th.Date), GETDATE()) > @days_in_state
+ORDER BY DATEDIFF(DAY, MAX(th.Date), GETDATE()) DESC
