@@ -1,0 +1,27 @@
+-- =============================================
+-- Description: Returns files ranked by version count, highest first.
+--              Includes file path to distinguish files with the same name
+--              in different vault locations.
+-- =============================================
+
+;With Columns as(
+	Select	
+		d.Filename as file_name,
+		p.Path as file_path,
+		r.RevNR as versions
+	From Revisions r
+	INNER JOIN Documents d
+		ON r.DocumentID = d.DocumentID
+	INNER JOIN DocumentsInProjects dp
+		ON d.DocumentID = dp.DocumentID
+	INNER JOIN Projects p
+		ON dp.ProjectID = p.ProjectID
+)
+
+Select
+	COUNT(versions)	as number_of_versions,
+	file_name,
+	file_path
+From Columns	
+GROUP BY file_name, file_path
+ORDER BY COUNT(versions) DESC
