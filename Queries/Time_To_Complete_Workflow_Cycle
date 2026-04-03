@@ -1,0 +1,21 @@
+-- =============================================
+-- Description: Calculates days from first workflow transition to reaching
+--              the defined end state. Only includes files that have
+--              completed the full cycle. Results are ordered longest first.
+-- =============================================
+
+Declare @end_state nvarchar(50) = 'Issued' --Which state represents the end of the workflow loop?
+
+Select
+	d.FileName,
+	DATEDIFF(DAY, MIN(th.Date), MAX(CASE WHEN s.Name = @end_state THEN th.Date END)) as days_between_start_end_states
+From TransitionHistory th
+INNER JOIN Transitions t
+	ON th.TransitionID = t.TransitionID
+INNER JOIN Status s
+	ON s.StatusID = t.Destination
+INNER JOIN Documents d
+	ON th.DocumentID = d.DocumentID
+GROUP BY d.FileName
+HAVING MAX(CASE WHEN s.Name = @end_state THEN th.Date END) IS NOT NULL
+ORDER BY DATEDIFF(DAY, MIN(th.Date), MAX(CASE WHEN s.Name = @end_state THEN th.Date END)) DESC
