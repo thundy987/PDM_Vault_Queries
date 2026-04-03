@@ -1,15 +1,17 @@
 -- =============================================
--- Description: Ranks users by check-in activity per month.
---              Excludes disabled user accounts.
+-- Description: Ranks active users by check-in count per month.
+--              Uses EOMONTH for consistent month grouping.
+--              Results are ordered by most recent month first.
 -- =============================================
 
 Select 
-    b.Username as username,
-    YEAR(a.Date) * 100 + MONTH(a.Date) AS YearMonthInteger,
-    RANK() over (Partition By YEAR(a.Date) * 100 + MONTH(a.Date) ORDER BY COUNT(*) DESC) as CheckInRank,
-    COUNT(*) as CheckInCount
-From Revisions as a
-inner join Users as b
-    on a.UserID = b.UserID
-where b.Enabled <> 0
-group by b.Username, (YEAR(a.Date) * 100 + MONTH(a.Date)), b.Enabled;
+	u.Username as username,
+	RANK () Over (Partition By (EOMONTH(r.Date)) Order By Count(*) DESC) as rank,
+	EOMONTH(r.Date) as month,
+	Count(*) as number_of_check_ins
+From Users u
+Inner Join Revisions r
+on u.UserID	= r.UserID
+Where u.Enabled <> 0 
+Group By u.Username, EOMONTH(r.Date), u.Enabled
+Order By EOMONTH(r.Date) DESC
