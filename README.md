@@ -15,8 +15,8 @@ This will be a growing list as customer issues arise.
 | **Version Count by File** | Ranks files by number of versions, highest first. Includes file path to distinguish same-named files in different vault locations. |
 | **Least Used States and Transitions** | Ranks workflow states and transitions by usage frequency. Useful for identifying cleanup candidates. |
 | **User Check-in Activity** | Ranks active users by check-in count per month. |
-| **Days to Complete Workflow Cycle** | Calculates how long files take to move from first transition to a defined end state. |
-| **Long-Term Checkouts** | Identifies users holding checkouts beyond a defined threshold, with file count and longest duration. |
+| **Days to Complete Workflow Cycle** | Calculates how long files take to move from first transition to a defined end state (i.e. 'How long do we take to release files?'. |
+| **Long-Term Checkouts** | Identifies users keeping files checked out beyond a defined threshold, with file count and longest duration. |
 
 ---
 
